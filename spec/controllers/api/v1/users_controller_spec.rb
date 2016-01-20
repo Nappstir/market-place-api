@@ -1,16 +1,14 @@
 require 'spec_helper'
 
 describe Api::V1::UsersController do
-  before(:each) { request.headers["Accept"] = "application/vnd.marketplace.v1" }
-
   describe "GET #show" do
     before(:each) do
       @user = FactoryGirl.create(:user)
-      get :show, id: @user.id, format: :json
+      get :show, id: @user.id
     end
 
     it "returns the information about a user on a hash" do
-      user_response = JSON.parse(response.body, symbolize_names: true)
+      user_response = json_response
       expect(user_response[:email]).to eql @user.email
     end
 
@@ -26,7 +24,7 @@ describe Api::V1::UsersController do
       end
 
       it "renders the json representation for the user record just created" do
-        user_response = JSON.parse(response.body, symbolize_names: true)
+        user_response = json_response
         expect(user_response[:email]).to eql @user_attributes[:email]
       end
 
@@ -40,12 +38,12 @@ describe Api::V1::UsersController do
       end
 
       it "renders an error" do
-        user_response = JSON.parse(response.body, symbolize_names: true)
+        user_response = json_response
         expect(user_response).to have_key(:errors)
       end
 
       it "renders the json errors on why the user could not be created" do
-        user_response = JSON.parse(response.body, symbolize_names: true)
+        user_response = json_response
         expect(user_response[:errors][:email]).to include "can't be blank"
       end
 
@@ -56,6 +54,7 @@ describe Api::V1::UsersController do
   describe "PUT/PATCH #update" do
     before(:each) do
       @user = FactoryGirl.create(:user)
+      api_authorization_header(@user.auth_token)
     end
 
     context "when a user is successfully updated" do
@@ -64,7 +63,7 @@ describe Api::V1::UsersController do
       end
 
       it "renders the json representation for the updated user" do
-        user_response = JSON.parse(response.body, symbolize_names: true)
+        user_response = json_response
         expect(user_response[:email]).to eql "newmail@example.com"
       end
 
@@ -77,12 +76,12 @@ describe Api::V1::UsersController do
       end
 
       it "renders errors" do
-        user_response = JSON.parse(response.body, symbolize_names: true)
+        user_response = json_response
         expect(user_response).to have_key(:errors)
       end
 
       it "renders the json errors on why the user could not be created" do
-        user_response = JSON.parse(response.body, symbolize_names: true)
+        user_response = json_response
         expect(user_response[:errors][:email]).to include "is invalid"
       end
 
@@ -93,7 +92,8 @@ describe Api::V1::UsersController do
   describe "DELETE #destroy" do
     before(:each) do
       @user = FactoryGirl.create :user
-      delete :destroy, { id: @user.id }
+      api_authorization_header(@user.auth_token)
+      delete :destroy, { id: @user.auth_token }
     end
 
     it { should respond_with 204 }
