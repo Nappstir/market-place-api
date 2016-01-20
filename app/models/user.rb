@@ -4,6 +4,8 @@ class User < ActiveRecord::Base
 
   before_create :generate_authentication_token!
 
+  has_many :products, dependent: :destroy
+
   def generate_authentication_token!
     # check the condition after processing the loop.
     self.auth_token = Devise.friendly_token
