@@ -4,7 +4,8 @@ describe Api::V1::ProductsController do
 
   describe "GET #show" do
     before(:each) do
-      @product = FactoryGirl.create(:product)
+      @user = FactoryGirl.create(:user)
+      @product = FactoryGirl.create(:product, user: @user)
       get :show, id: @product.id
     end
 
@@ -13,18 +14,31 @@ describe Api::V1::ProductsController do
       expect(product_response[:title]).to eql @product.title
     end
 
+    it "has the user as an embeded object" do
+      product_response = json_response[:product]
+      expect(product_response[:user][:email]).to eql @product.user.email
+    end
+
     it { should respond_with 200 }
   end
 
   describe "GET #index" do
     before(:each) do
-      4.times { FactoryGirl.create(:product) }
+      @user = FactoryGirl.create(:user)
+      4.times { FactoryGirl.create(:product, user: @user) }
       get :index
     end
 
     it "returns 4 product records from database" do
       product_response = json_response
       expect(product_response[:products]).to have(4).items
+    end
+
+    it "returns the users as embeded objects for products" do
+      product_response = json_response[:products]
+      product_response.each do |product_response|
+        expect(product_response[:user]).to be_present
+      end
     end
 
     it { should respond_with 200 }
