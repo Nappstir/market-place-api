@@ -26,22 +26,44 @@ describe Api::V1::ProductsController do
     before(:each) do
       @user = FactoryGirl.create(:user)
       4.times { FactoryGirl.create(:product, user: @user) }
-      get :index
     end
 
-    it "returns 4 product records from database" do
-      product_response = json_response
-      expect(product_response[:products]).to have(4).items
-    end
-
-    it "returns the users as embeded objects for products" do
-      product_response = json_response[:products]
-      product_response.each do |product_response|
-        expect(product_response[:user]).to be_present
+    context "when product_ids parameter is NOT sent" do
+      before(:each) do
+        get :index
       end
+
+      it "returns 4 product records from database" do
+        product_response = json_response
+        expect(product_response[:products]).to have(4).items
+      end
+
+      it "returns the users as embeded objects for products" do
+        product_response = json_response[:products]
+        product_response.each do |product_response|
+          expect(product_response[:user]).to be_present
+        end
+      end
+
+      it { should respond_with 200 }
     end
 
-    it { should respond_with 200 }
+    context "when product_ids parameter is sent" do
+      before(:each) do
+        @user = FactoryGirl.create(:user)
+        3.times { FactoryGirl.create(:product, user: @user) }
+        get :index, product_ids: @user.product_ids
+      end
+
+      it "returns just the products that belong to the user" do
+        product_response = json_response[:products]
+        product_response.each do |product_response|
+          expect(product_response[:user][:email]).to eql @user.email
+        end
+      end
+
+    end
+
   end
 
   describe "POST #create" do
