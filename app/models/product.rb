@@ -14,4 +14,12 @@ class Product < ActiveRecord::Base
     where("price >= ?", price)
   end
 
+  def self.below_or_equal_to_price(price)
+    where("price <= ?", price)
+  end
+
+  def self.recent
+    order(:updated_at)
+  end
+
 end
