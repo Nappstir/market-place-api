@@ -26,7 +26,7 @@ class Product < ActiveRecord::Base
 
   def self.search(params = {})
     # If product_id provided
-    products = params[:product_ids].present? ? Product.find(params[:product_ids]) : Product.all
+    products = params[:product_ids].present? ? Product.where(id: params[:product_ids]) : Product.all
 
     # If product title provided
     products = products.filter_by_titles(params[:keyword]) if params[:keyword]
