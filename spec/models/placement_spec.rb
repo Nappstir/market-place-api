@@ -15,7 +15,6 @@ describe Placement do
 
     it "decreases the product quantity by the placement quantity" do
       product = placement.product
-      p "$" * 50
       expect{placement.decrement_product_quantity!}.to change{product.quantity}.by(-placement.quantity)
     end
   end
