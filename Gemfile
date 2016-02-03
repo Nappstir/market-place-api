@@ -21,6 +21,8 @@ gem 'jquery-rails'
 #Api gems
 gem 'active_model_serializers'
 gem 'kaminari'
+gem 'delayed_job_active_record'
+
 
 group :doc do
   # bundle exec rake doc:rails generates the API under doc/api.
